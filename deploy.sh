@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 完整的一键部署脚本 - 包含所有必要配置
+# 完整的一键部署脚本 - 包含所有必要配置 (修复playwright安装问题)
 
 echo "===================================================="
 echo "闲鱼自动回复系统集成版 - 一键部署(自包含版)"
@@ -73,9 +73,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # 复制项目文件
 COPY . .
 
-# 安装Playwright浏览器
-RUN playwright install chromium && \
-    playwright install-deps chromium
+# 正确安装Playwright和浏览器
+RUN pip install playwright && \
+    python -m playwright install chromium && \
+    python -m playwright install-deps chromium
 
 # 创建必要的目录并设置权限
 RUN mkdir -p /app/logs /app/data /app/backups /app/static/uploads/images \
@@ -97,8 +98,6 @@ EOL
 # 创建docker-compose文件
 echo "创建docker-compose配置..."
 cat > docker-compose.yml << 'EOL'
-version: '3.8'
-
 services:
   xianyu-integrated:
     build:
